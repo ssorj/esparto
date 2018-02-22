@@ -1,10 +1,44 @@
-import machine
+import argon.main
+import argon.message
 import bme280
+import gc
+import machine
+import network
 import time
 
-i2c = machine.I2C(scl=machine.Pin(5), sda=machine.Pin(4))
-bme = bme280.BME280(i2c=i2c)
+def setup():
+    sta_if = network.WLAN(network.STA_IF);
+    sta_if.active(True)
+    sta_if.connect("1 Beaconcrest Court", "billerica15")
 
-while True:
+    while not sta_if.isconnected():
+        time.sleep(1)
+
+    print("WIFI UP")
+
+    gc.collect()
+    print("MEM FREE", gc.mem_free())
+
+def bme():
+    i2c = machine.I2C(scl=machine.Pin(5), sda=machine.Pin(4))
+    bme = bme280.BME280(i2c=i2c)
     print(bme.values)
-    time.sleep(1)
+    
+def run():
+    i2c = machine.I2C(scl=machine.Pin(5), sda=machine.Pin(4))
+    bme = bme280.BME280(i2c=i2c)
+
+    message = argon.message.Message()
+    
+    for i in range(100):
+        time.sleep(5)
+
+        message.body = "|".join(bme.values)
+
+        try:
+            argon.main.send("amqp.zone", "5672", "hello", message)
+        except KeyboardInterrupt:
+            pass
+
+        gc.collect()
+        print("MEM FREE", gc.mem_free())

@@ -1,35 +1,38 @@
-PORT := /dev/ttyUSB0
-BAUD := 115200
+export AMPY_PORT := /dev/ttyUSB0
+export AMPY_BAUD := 115200
 
 ARGON_DIR := ~/code/argon
 
+.PHONY: default
+default: repl
+
+.PHONY: init
+init:
+	ampy mkdir /argon
+
 .PHONY: install
 install:
-#	ampy --port ${PORT} --baud ${BAUD} rmdir /argon
-	ampy --port ${PORT} --baud ${BAUD} mkdir /argon
-	ampy --port ${PORT} --baud ${BAUD} put ${ARGON_DIR}/python/argon/common.py /argon/common.py
-	ampy --port ${PORT} --baud ${BAUD} put ${ARGON_DIR}/python/argon/data.py /argon/data.py
-	ampy --port ${PORT} --baud ${BAUD} put ${ARGON_DIR}/python/argon/data_debug.py /argon/data_debug.py
-	ampy --port ${PORT} --baud ${BAUD} put ${ARGON_DIR}/python/argon/__init__.py /argon/__init__.py
-	ampy --port ${PORT} --baud ${BAUD} put ${ARGON_DIR}/python/argon/frames.py /argon/frames.py
-	ampy --port ${PORT} --baud ${BAUD} put ${ARGON_DIR}/python/argon/frames_debug.py /argon/frames_debug.py
-	ampy --port ${PORT} --baud ${BAUD} put ${ARGON_DIR}/python/argon/transport.py /argon/transport.py
-	ampy --port ${PORT} --baud ${BAUD} put ${ARGON_DIR}/python/argon/transport_debug.py /argon/transport_debug.py
-	ampy --port ${PORT} --baud ${BAUD} put bme280.py /bme280.py
+	scripts/install-argon ${ARGON_DIR}
+	mpy-cross bme280.py -o bme280.mpy
+	ampy put bme280.mpy /bme280.mpy
+	ampy put test.py /test.py
 
 .PHONY: test
 test:
-	ampy --port ${PORT} --baud ${BAUD} run test.py
+	ampy run test.py
 
 .PHONY: test2
 test2:
-	ampy --port ${PORT} --baud ${BAUD} run test2.py
+	ampy run test2.py
 
 .PHONY: ls
 ls:
-	ampy --port ${PORT} --baud ${BAUD} ls
-	ampy --port ${PORT} --baud ${BAUD} ls /argon
+	ampy ls
 
 .PHONY: repl
 repl:
-	picocom ${PORT} -b ${BAUD}
+	picocom ${AMPY_PORT} -b ${AMPY_BAUD}
+
+.PHONY: flash-micropython
+flash-micropython:
+	esptool.py --chip esp32 --port ${AMPY_PORT} write_flash -z 0x1000 esp32-*.bin

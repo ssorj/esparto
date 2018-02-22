@@ -1,0 +1,19 @@
+#!/usr/bin/python3
+
+from plano import *
+
+argon_dir = ARGS[1]
+argon_python_dir = join(argon_dir, "python")
+
+with temp_working_dir() as temp_dir:
+    for from_path in find(argon_python_dir, "*.py"):
+        if "_debug" in file_name(from_path):
+            continue
+        
+        mpy_path = join(temp_dir, from_path[len(argon_python_dir) + 1:])[:-3] + ".mpy"
+        to_path = mpy_path[len(temp_dir):]
+
+        make_dir(parent_dir(mpy_path))
+        
+        call("mpy-cross {} -o {}", from_path, mpy_path)
+        call("ampy put {} {}", mpy_path, to_path)
