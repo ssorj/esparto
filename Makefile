@@ -12,18 +12,11 @@ init:
 
 .PHONY: install
 install:
+	(ampy mkdir /argon 2>/dev/null || :)
 	scripts/install-argon ${ARGON_DIR}
 	mpy-cross bme280.py -o bme280.mpy
 	ampy put bme280.mpy /bme280.mpy
 	ampy put test.py /test.py
-
-.PHONY: test
-test:
-	ampy run test.py
-
-.PHONY: test2
-test2:
-	ampy run test2.py
 
 .PHONY: ls
 ls:

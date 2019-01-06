@@ -30,15 +30,15 @@ def run():
 
     message = argon.message.Message()
     
-    for i in range(100):
-        time.sleep(5)
+    while True:
+        time.sleep(10)
 
-        message.body = "|".join(bme.values)
+        message.body = "[" + ", ".join(bme.values) + "]"
 
         try:
-            argon.main.send("amqp.zone", "5672", "hello", message)
-        except KeyboardInterrupt:
-            pass
+            argon.main.send("amqp.zone", "5672", "test", message)
+        except Exception as e:
+            print("ERROR! {}".format(str(e)))
 
         gc.collect()
         print("MEM FREE", gc.mem_free())

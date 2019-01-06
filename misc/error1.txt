@@ -1,0 +1,13 @@
+MEM FREE 30960
+MEM FREE 30960
+MEM FREE 30960
+MEM FREE 30960
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "test.py", line 41, in run
+  File "test.py", line 39, in run
+  File "/home/jross/code/argon/python/argon/main.py", line 53, in send
+  File "/home/jross/code/argon/python/argon/transport.py", line 108, in run
+  File "/home/jross/code/argon/python/argon/transport.py", line 55, in run
+OSError: [Errno 113] EHOSTUNREACH
+>>> I (5956123) wifi: bcn_timout,ap_probe_send_start
