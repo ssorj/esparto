@@ -1,3 +1,5 @@
+import argon.main
+import argon.message
 import bme280
 import gc
 import machine
@@ -21,19 +23,22 @@ def bme():
     i2c = machine.I2C(scl=machine.Pin(5), sda=machine.Pin(4))
     bme = bme280.BME280(i2c=i2c)
     print(bme.values)
-
+    
 def run():
     i2c = machine.I2C(scl=machine.Pin(5), sda=machine.Pin(4))
     bme = bme280.BME280(i2c=i2c)
 
+    message = argon.message.Message()
+    
     while True:
-        time.sleep(2)
+        time.sleep(10)
 
-        print("[" + ", ".join(bme.values) + "]")
+        message.body = "[" + ", ".join(bme.values) + "]"
+
+        try:
+            argon.main.send("amqp.zone", "5672", "test", message)
+        except Exception as e:
+            print("ERROR! {}".format(str(e)))
 
         gc.collect()
         print("MEM FREE", gc.mem_free())
-
-if __name__ == "__main__":
-    setup()
-    run()
